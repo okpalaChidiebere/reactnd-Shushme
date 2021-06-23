@@ -1,0 +1,12 @@
+{
+  "name": "reactnd-Shushme",
+  "displayName": "reactnd-Shushme",
+  "expo": {
+    "name": "reactnd-Shushme",
+    "slug": "reactnd-Shushme",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
