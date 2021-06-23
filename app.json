@@ -7,6 +7,18 @@
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "ios": {
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "location"
+        ],
+        "NSLocationAlwaysAndWhenInUseUsageDescription":"Some message to appease Apple and the user why you need this permission",
+        "NSLocationWhenInUseUsageDescription":"Some message to appease Apple and the user why you need this permission"
+      }
+    },
+    "android": {
+      "permissions":["ACCESS_COARSE_LOCATION","ACCESS_FINE_LOCATION","ACCESS_BACKGROUND_LOCATION"]
+    }
   }
 }

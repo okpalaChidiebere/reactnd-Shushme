@@ -37,6 +37,15 @@
 	</dict>
 	<key>UILaunchStoryboardName</key>
 	<string>SplashScreen</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>"Some message to appease Apple and the user why you need this permission"</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>"Some message to appease Apple and the user why you need this permission"</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>processing</string>
+	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
