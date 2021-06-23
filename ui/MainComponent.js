@@ -1,8 +1,23 @@
 import React, { useState, useEffect } from "react"
-import { Text, View, StyleSheet, Image, Alert, ActivityIndicator, Switch }  from "react-native"
+import { Text, View, StyleSheet, Image, Alert, ActivityIndicator, Switch, Button }  from "react-native"
 import * as Location from "expo-location"
+import { component_place_picker } from "../utils/strings"
+import db, { TABLE_NAME, COLUMN_PLACE_ID } from "../utils/AppDatabase"
 
-export default function MainComponent() {
+export default function MainComponent({ route, navigation }) {
+
+    if(route.params){
+        db.transaction(
+            (tx) => {
+                tx.executeSql("INSERT INTO "+TABLE_NAME+"("+COLUMN_PLACE_ID+") values (?)", [route.params.placeID]);
+                /*tx.executeSql("select * from "+TABLE_NAME, [], (_, { rows }) =>
+                console.log(JSON.stringify(rows))
+                );*/
+            },
+            null,
+            //forceUpdate //to be implemented in future lesson
+        );
+    }
 
     const [state, setState ] = useState({
         locationPermissionIsEnabled: null,
@@ -96,6 +111,11 @@ export default function MainComponent() {
                         value={locationPermissionIsEnabled}
                     />
                 </View>
+                <View style={{ marginTop: 15, marginBottom: 15 }}>
+                    <Button title="ADD NEW LOCATION" onPress={() => navigation.navigate(component_place_picker)} />
+                </View>
+                <Text style={{ flexGrow: 2, fontSize: 16 }}>Locations</Text>
+                <View style={{ height: 2, marginTop: 5, marginBottom: 5, backgroundColor:"red"}}/>
             </View>
             <View style={{
                 flex: 1,

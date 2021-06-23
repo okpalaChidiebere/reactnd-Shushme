@@ -2,7 +2,8 @@ import React from "react"
 import { NavigationContainer } from "@react-navigation/native"
 import { createStackNavigator } from "@react-navigation/stack"
 import MainComponent, { MainComponentOptions } from "./MainComponent"
-import { component_main } from "../utils/strings"
+import PlacePicker, { PlacePickerOptions } from "./PlacePicker"
+import { component_main, component_place_picker } from "../utils/strings"
 
 const Stack = createStackNavigator()
 const MainNavigator = () => (
@@ -12,6 +13,11 @@ const MainNavigator = () => (
           name={component_main}
           component={MainComponent}
           options={MainComponentOptions}
+        />
+        <Stack.Screen
+          name={component_place_picker}
+          component={PlacePicker}
+          options={PlacePickerOptions}
         />
     </Stack.Navigator>
   </NavigationContainer>
