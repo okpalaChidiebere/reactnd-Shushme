@@ -4,6 +4,12 @@ import * as Location from "expo-location"
 import { component_place_picker } from "../utils/strings"
 import db, { TABLE_NAME, COLUMN_PLACE_ID } from "../utils/AppDatabase"
 import PlaceCardItems from "./PlaceCardItems"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { registerAllGeofences, unRegisterAllGeofences, updateGeofencesList } from "../utils/Geofencing"
+
+const SUSHME_APP_STORAGE_KEY = "SushMe:PreferenceManager"
+const GEOFENCE_ENABLED = "GeofenceEnabled"
+const DEFAULT_GEOFENCE_PREF_VALUE = true //we set it to true because we want to initialize geoFences as sonn as the app is installed :)
 
 export default function MainComponent({ route, navigation }) {
 
@@ -16,6 +22,7 @@ export default function MainComponent({ route, navigation }) {
                 );*/
             },
             null,
+            updateGeofencesList
             /**
              * When we navigate back to this screen from the PlacePicker, this component will be re-rendered(PlaceCardItems gets re-rendered)
              * So we can get the newly added place in the database uodated in screen right away
@@ -25,6 +32,7 @@ export default function MainComponent({ route, navigation }) {
 
     const [state, setState ] = useState({
         locationPermissionIsEnabled: null,
+        geoFencingIsEnabled: null,
     })
 
     useEffect(() => {
@@ -36,11 +44,24 @@ export default function MainComponent({ route, navigation }) {
             await Location.getBackgroundPermissionsAsync();
 
             if(fgGranted === 'granted' && bgGranted === 'granted'){
-                setState({locationPermissionIsEnabled: true})
+                setState(previousSate => ({
+                    ...previousSate,
+                    locationPermissionIsEnabled: true
+                }))
             }else{
-                setState({locationPermissionIsEnabled: false})
+                setState(previousSate => ({
+                    ...previousSate,
+                    locationPermissionIsEnabled: false
+                }))
             }
 
+            const isEnabled = await getDefaultSharedPreferences(GEOFENCE_ENABLED)
+            setState(previousSate => ({
+                ...previousSate,
+                geoFencingIsEnabled: isEnabled
+            }))
+
+            registerAllGeofences()
         })()
     }, [])
 
@@ -55,13 +76,15 @@ export default function MainComponent({ route, navigation }) {
             console.log(fgGranted, bgGranted)
 
             if(fgGranted === 'granted' && bgGranted === 'granted'){
-                setState({locationPermissionIsEnabled: true})
                 setState(previousSate => ({
                     ...previousSate,
                     locationPermissionIsEnabled: true
                 }))
             }else{
-                setState({locationPermissionIsEnabled: false})
+                setState(previousSate => ({
+                    ...previousSate,
+                    locationPermissionIsEnabled: false,
+                }))
                 Alert.alert(
                     "Location Access Required",
                     "App requires location even the App is backgrounded and Foreground."+
@@ -81,8 +104,23 @@ export default function MainComponent({ route, navigation }) {
         }))*/
     }
 
+    const setOnSwitchChangeListener = async (isOn) => {
+        
+        setState(previousSate => ({
+            ...previousSate, 
+            geoFencingIsEnabled: isOn
+        }))
 
-    const { locationPermissionIsEnabled } = state
+        await AsyncStorage.mergeItem(SUSHME_APP_STORAGE_KEY, JSON.stringify({
+            [GEOFENCE_ENABLED]: isOn
+        }))
+
+        if (isOn) registerAllGeofences() //whenever the user turns back geofences on, we register all the locations they have saved if any
+        else unRegisterAllGeofences() //we stop listening for geofences
+    }
+
+
+    const { locationPermissionIsEnabled, geoFencingIsEnabled } = state
 
     if (locationPermissionIsEnabled === null) { //user hans't given us any permission yet
         return <View style={{flex: 1, justifyContent: "center", alignItems:"center"}}><ActivityIndicator style={{marginTop: 30}} size="large" color="#d9d9d9"/></View> //we just show a loading indicator
@@ -100,6 +138,20 @@ export default function MainComponent({ route, navigation }) {
             }}>
                 <Text style={{fontSize: 16}}>Settings</Text>
                 <View style={{ height: 2, marginTop: 5, marginBottom: 5, backgroundColor:"red"}}/>
+                <View style={{ flexDirection: "row", alignItems:"center", }}>
+                    <Image
+                    style={{width: 35, height: 35, marginRight: 10}}
+                    source={require("../assets/ic_globe_primary_24dp.png")}
+                    />
+                    <Text style={{ flexGrow: 2, fontSize: 16 }}>Enable Fences</Text>
+                    <Switch
+                        trackColor={{ false: "#767577", true: "#ffccdd" }}
+                        thumbColor={geoFencingIsEnabled ? "#FF4081" : "#f4f3f4"}
+                        ios_backgroundColor="#3e3e3e"
+                        onValueChange={(v) => setOnSwitchChangeListener(v)}
+                        value={geoFencingIsEnabled}
+                    />
+                </View>
                 <View style={{ flexDirection: "row", alignItems:"center", }}>
                     <Image
                     style={{width: 35, height: 35, marginRight: 10}}
@@ -123,7 +175,7 @@ export default function MainComponent({ route, navigation }) {
             </View>
             <View style={{
                 flex: 1,
-                flexGrow: 3,
+                flexGrow: 2.5,
             }}>
                 <ScrollView style={styles.listArea}>
                     <PlaceCardItems />
@@ -145,10 +197,20 @@ const styles = StyleSheet.create({
 export function MainComponentOptions({ route, navigation }) {
 
     return {
-        title: "Android Me",
+        title: "ShushMe",
         headerTintColor: '#fff',
         headerStyle: { 
             backgroundColor: "#3F51B5",
         },
     }
+}
+
+async function getDefaultSharedPreferences(prefKey){
+    const prefs = await AsyncStorage.getItem(SUSHME_APP_STORAGE_KEY)
+
+    if(!prefs)
+        return DEFAULT_GEOFENCE_PREF_VALUE //early return
+
+    //due to the value is boolen, we just have to check if it null or not
+    return JSON.parse(prefs)[prefKey] !== null ? JSON.parse(prefs)[prefKey] : DEFAULT_GEOFENCE_PREF_VALUE
 }
