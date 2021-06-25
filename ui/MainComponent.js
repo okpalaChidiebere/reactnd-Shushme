@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react"
-import { Text, View, StyleSheet, Image, Alert, ActivityIndicator, Switch, Button }  from "react-native"
+import { Text, View, StyleSheet, Image, Alert, ActivityIndicator, Switch, Button, ScrollView }  from "react-native"
 import * as Location from "expo-location"
 import { component_place_picker } from "../utils/strings"
 import db, { TABLE_NAME, COLUMN_PLACE_ID } from "../utils/AppDatabase"
+import PlaceCardItems from "./PlaceCardItems"
 
 export default function MainComponent({ route, navigation }) {
 
@@ -15,7 +16,10 @@ export default function MainComponent({ route, navigation }) {
                 );*/
             },
             null,
-            //forceUpdate //to be implemented in future lesson
+            /**
+             * When we navigate back to this screen from the PlacePicker, this component will be re-rendered(PlaceCardItems gets re-rendered)
+             * So we can get the newly added place in the database uodated in screen right away
+             */
         );
     }
 
@@ -120,10 +124,10 @@ export default function MainComponent({ route, navigation }) {
             <View style={{
                 flex: 1,
                 flexGrow: 3,
-                alignItems: 'center',
-                justifyContent: 'center',
             }}>
-                <Text style={{width: 350, color:"#424242", marginLeft:70}}>Press the glass of water after you've hydrated</Text>
+                <ScrollView style={styles.listArea}>
+                    <PlaceCardItems />
+                </ScrollView>
             </View>
         </View>
     </View>

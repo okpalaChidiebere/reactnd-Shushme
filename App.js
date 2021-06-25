@@ -4,6 +4,8 @@ import { StyleSheet } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context"
 import MainNavigator from "./ui/MainNavigator"
 import db, { createTable } from "./utils/AppDatabase"
+import { Provider as StoreProvider } from "react-redux"
+import store from "./store/configureStore"
 
 export default function App() {
 
@@ -13,10 +15,12 @@ export default function App() {
 
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="light" backgroundColor="#303F9F"/>
-      <MainNavigator />
-    </SafeAreaView>
+    <StoreProvider store={store}>
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" backgroundColor="#303F9F"/>
+        <MainNavigator />
+      </SafeAreaView>
+    </StoreProvider>
   );
 }
 

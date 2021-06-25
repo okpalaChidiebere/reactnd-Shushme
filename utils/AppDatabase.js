@@ -24,4 +24,21 @@ export const createTable = (db) => {
     })
 }
 
+export const loadAllPlaceIDs = () => {
+    const SQL_LOAD_ALL_PLACES_IDs = 
+    `SELECT ${COLUMN_PLACE_ID} FROM ${TABLE_NAME};`
+    
+    return new Promise((resolve, reject) => {
+        db.transaction(
+            async (tx) => {
+              tx.executeSql( SQL_LOAD_ALL_PLACES_IDs, [], (_, { rows: { _array } }) => resolve(_array) )
+            },
+            (e) => {
+                reject("ERROR: " + e.message)
+                console.log("ERROR: " + e.message)
+            }
+        );
+    })
+}
+
 export default db
