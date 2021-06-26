@@ -28,9 +28,13 @@ TaskManager.defineTask(GEOFENCE_TASK_NAME, async ({ data: { eventType, region },
 
 /***
 * Updates the local ArrayList of Geofences using data from the passed in list
-* Uses the Place ID defined by the API as the Geofence object Id
 *
-* 
+* Uses the {@code #getPlaceByID} method to get the longitude and latitiude of places by placeID
+
+* Build list of Geofence objects called regoins by expo.
+
+* Add or remove regions from already running geofencing task by calling startGeofencingAsync again
+* with the new array of regions or geofence objects.
 */
 export async function updateGeofencesList(){
 
@@ -79,6 +83,9 @@ async function getGeofencingRequest(){
     return await Location.hasStartedGeofencingAsync(GEOFENCE_TASK_NAME)
 }
 
+/***
+* Registers the list of Geofences specified in mGeofenceList with Google Place Services
+*/
 export async function registerAllGeofences(){
     const isGeoFenceRegistered = await getGeofencingRequest()
 
@@ -96,6 +103,9 @@ export async function registerAllGeofences(){
     return 
 }
 
+/***
+* Unregisters all the Geofences created by this app from Google Place Services
+*/
 export async function unRegisterAllGeofences(){
     const isGeoFenceRegistered = await getGeofencingRequest()
 
