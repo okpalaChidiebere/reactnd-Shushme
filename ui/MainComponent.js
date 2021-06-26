@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
-import { Text, View, StyleSheet, Image, Alert, ActivityIndicator, Switch, Button, ScrollView }  from "react-native"
+import { Text, View, StyleSheet, Image, Alert, ActivityIndicator, Switch, 
+    Button, ScrollView, Pressable, Linking, TouchableWithoutFeedback }  from "react-native"
 import * as Location from "expo-location"
 import { component_place_picker } from "../utils/strings"
 import db, { TABLE_NAME, COLUMN_PLACE_ID } from "../utils/AppDatabase"
@@ -180,6 +181,16 @@ export default function MainComponent({ route, navigation }) {
                 <ScrollView style={styles.listArea}>
                     <PlaceCardItems />
                 </ScrollView>
+                <View style={{ justifyContent:"center", alignItems:"center" }}>
+                    <TouchableWithoutFeedback onPress={() => {
+                        Linking.openURL("https://policies.google.com/privacy")
+                    }}>
+                        <Image
+                        style={{resizeMode: 'stretch', width: "33%", height: 17, }}
+                        source={require("../assets/powered_by_google_on_white.png")}
+                        />
+                    </TouchableWithoutFeedback>
+                </View>
             </View>
         </View>
     </View>
